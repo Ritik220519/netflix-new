@@ -2,7 +2,8 @@ const express = require("express");
 const User = require("../model/userSchema");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
-const validateForSignup = require("../utils/validate");
+const {validateForSignup , validateForLogin} = require("../utils/validate");
+const jwt = require("jsonwebtoken");
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -25,7 +26,7 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
-
+    validateForLogin(req);
     const user = await User.findOne({ emailId: emailId });
 
     if (!user) {
@@ -37,6 +38,8 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("p Invalid credentials");
     }
 
+    const token = await jwt.sign({ user_id: user._id }, "Netflix-SecretKey" );
+    res.cookie("token", token);
     res.send(`${user.firstName} successfully login.`);
   } catch (error) {
     res.status(400).send("login failed : " + error.message);
