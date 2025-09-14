@@ -38,12 +38,18 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("p Invalid credentials");
     }
 
-    const token = await jwt.sign({ user_id: user._id }, "Netflix-SecretKey" );
+    const token = await jwt.sign({ user_id: user._id }, "Netflix-SecretKey" , {expiresIn : "10hr"});
     res.cookie("token", token);
     res.send(`${user.firstName} successfully login.`);
   } catch (error) {
     res.status(400).send("login failed : " + error.message);
   }
 });
+
+authRouter.post("/logout" , async (req , res) =>{
+  const token = req.cookies;
+  res.cookie("token" , null , {expires : new Date(Date.now())});
+  res.send("Logout successfuly.")
+})
 
 module.exports = authRouter;

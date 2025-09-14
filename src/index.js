@@ -8,8 +8,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 const authRouter = require("./Routes/authentication");
+const profileView = require("./Routes/profile");
 
 app.use("/", authRouter);
+app.use("/" , profileView);
 
 connectionDB()
   .then(() => {
@@ -22,4 +24,3 @@ connectionDB()
     console.log("Database connection failed : " + err.message);
   });
 
-  
